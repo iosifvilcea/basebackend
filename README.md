@@ -8,7 +8,7 @@ This file provides guidance when working with code in this repository.
 | Profile | `app.url`                 | Secure cookies | Log format |
 | ------- | ------------------------- | -------------- | ---------- |
 | `dev`   | `http://0.0.0.0/`         | `false`        | Plain text |
-| `prod`  | `https://blankthings.com` | `true`         | JSON (ECS) |
+| `prod`  | `https://your-app.com`    | `true`         | JSON (ECS) |
 |         |                           |                |            |
 
 The active profile is set in `application.properties` (`spring.profiles.active=dev`). Override at runtime with `--spring.profiles.active=prod`.
@@ -110,6 +110,50 @@ chmod +x .git/hooks/pre-commit .git/hooks/pre-push
 | `pre-push`   | `./gradlew test` — runs the full unit test suite before pushing                                                              |
 
 
+## CI/CD
+
+Defined in `.github/workflows/ci.yml`. Triggers on PRs to `develop` and `main`, and on every push to `main`.
+
+### Pipeline
+
+| Job      | Trigger              | Steps                                                              |
+|----------|----------------------|--------------------------------------------------------------------|
+| `ci`     | PRs + push to `main` | Spins up a PostgreSQL service container, runs `spotlessCheck` then `./gradlew test` |
+| `deploy` | Push to `main` only  | Builds and pushes the Docker image to GHCR, then deploys to the VPS |
+
+### Required secrets
+
+| Secret                | Description                                        |
+|-----------------------|----------------------------------------------------|
+| `VPS_HOST`            | IP or hostname of the VPS                          |
+| `VPS_USER`            | SSH user on the VPS                                |
+| `VPS_SSH_KEY`         | Private SSH key for authentication                 |
+| `GHCR_PAT`            | Personal access token for pulling the image on the VPS |
+| `TS_OAUTH_CLIENT_ID`  | Tailscale OAuth client ID for the CI runner        |
+| `TS_OAUTH_SECRET`     | Tailscale OAuth secret for the CI runner           |
+
+`GITHUB_TOKEN` is provided automatically by GitHub Actions for pushing to GHCR.
+
+
+## Database Migrations
+
+Migrations are managed by Flyway and live in `src/main/resources/db/migration/`. The app applies pending migrations automatically on startup.
+
+### Rules
+
+- Never edit a migration file after it has been applied — Flyway checksums each file and will refuse to start if a checksum changes.
+- Every schema change gets a new versioned file: `V2__add_something.sql`, `V3__alter_something.sql`, etc.
+- `V1__initial_schema.sql` covers the base auth schema (users, profiles, refresh_tokens, magic_link_tokens). New apps built from this scaffold should add their domain tables starting at `V2`.
+
+### Adding a migration
+
+```bash
+# Create a new file — bump the version number
+touch src/main/resources/db/migration/V2__your_change.sql
+# Write your SQL, then run the app or ./gradlew bootRun to apply it
+```
+
+
 ## Architecture Overview
 
 ### Domain Driven Module Structure
@@ -144,7 +188,7 @@ Repositories (UserRepository, ProfileRepository, ...)
 | Framework        | Spring Boot 4.0                                                       |
 | Security         | Spring Security — stateless JWT via HTTP-only cookies                 |
 | Authentication   | JJWT 0.13 — JWT generation and validation                             |
-| Database         | PostgreSQL + Spring Data JPA (Hibernate)                              |
+| Database         | PostgreSQL + Spring Data JPA (Hibernate) + Flyway migrations          |
 | Email            | Spring Mail — JavaMailSender over SMTP                                |
 | Metrics          | Micrometer + Prometheus registry                                      |
 | Logging          | SLF4J with ECS structured JSON format (prod)                          |
