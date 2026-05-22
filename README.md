@@ -1,16 +1,6 @@
 This file provides guidance when working with code in this repository.
 
 
-## First-time setup
-
-After cloning, run once to activate the pre-commit and pre-push hooks:
-
-```bash
-git config core.hooksPath .git-hooks
-chmod +x .git-hooks/pre-commit .git-hooks/pre-push
-```
-
-
 ## Building
 
 ### Profiles
