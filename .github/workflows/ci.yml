@@ -43,6 +43,8 @@ jobs:
           MAIL_PORT: 587
           MAIL_USERNAME: test@example.com
           MAIL_PASSWORD: test
+          APP_EMAIL_FROM: no-reply@example.com
+          APP_EMAIL_SUBJECT: Your login link
           JWT_SECRET: dGhpcy1pcy1hLXRlc3Qtc2VjcmV0LXRoYXQtaXMtbG9uZy1lbm91Z2gtZm9yLWhzMjU2
           JWT_EXPIRATION_MS: 900000
           REFRESH_TOKEN_EXPIRATION_DAYS: 30

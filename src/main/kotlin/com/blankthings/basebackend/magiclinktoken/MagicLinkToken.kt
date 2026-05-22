@@ -11,7 +11,6 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
-import org.jetbrains.annotations.NotNull
 import java.time.Instant
 
 const val EXPIRATION_TIME_15_MINS_IN_SECONDS = 900L
@@ -28,9 +27,7 @@ class MagicLinkToken(
     val user: User,
     @Column(nullable = false, unique = true)
     val tokenHash: String,
-    @NotNull
     val createdAt: Instant = Instant.now(),
-    @NotNull
     val expiresAt: Instant = Instant.now().plusSeconds(EXPIRATION_TIME_15_MINS_IN_SECONDS),
     private var used: Boolean = false,
 ) {

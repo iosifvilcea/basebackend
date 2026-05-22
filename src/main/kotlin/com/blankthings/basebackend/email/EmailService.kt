@@ -9,19 +9,15 @@ import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
 
-const val EMAIL_FROM = "no-reply@blankthings.com"
-const val EMAIL_SUBJECT = "Login link for blankthings.com"
-const val EMAIL_MESSAGE = "Here's your login for blankthings.com:\n\n %s/api/auth?token="
-
 @Service
 class EmailService(
     private val mailSender: JavaMailSender,
     private val analyticsTracker: AnalyticsTracker,
+    @Value("\${app.url}") private val url: String,
+    @Value("\${app.email.from}") private val from: String,
+    @Value("\${app.email.subject}") private val subject: String,
 ) {
     private val logger = LoggerFactory.getLogger(EmailService::class.java)
-
-    @Value("\${app.url}")
-    lateinit var url: String
 
     fun sendAuthEmail(
         email: String,
@@ -31,9 +27,9 @@ class EmailService(
         val message =
             SimpleMailMessage().apply {
                 setTo(normalizedEmail)
-                from = EMAIL_FROM
-                subject = EMAIL_SUBJECT
-                text = EMAIL_MESSAGE.format(url) + token
+                this.from = from
+                this.subject = subject
+                text = "Here's your login link:\n\n$url/api/auth?token=$token"
             }
 
         try {
