@@ -98,10 +98,11 @@ Tests must run and pass before push.
 
 ### Git Hooks
 
-The repo ships with two hooks in `.git/hooks/`. Make them executable once after cloning:
+Hooks live in `.git-hooks/`. Run once after cloning to activate them:
 
 ```bash
-chmod +x .git/hooks/pre-commit .git/hooks/pre-push
+git config core.hooksPath .git-hooks
+chmod +x .git-hooks/pre-commit .git-hooks/pre-push
 ```
 
 | Hook         | What it runs                                                                                                                 |

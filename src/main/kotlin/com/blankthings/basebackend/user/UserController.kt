@@ -3,9 +3,9 @@ package com.blankthings.basebackend.user
 import com.blankthings.basebackend.auth.AUTH_URL_PATH
 import com.blankthings.basebackend.auth.CookieManager
 import com.blankthings.basebackend.auth.REFRESH_TOKEN
+import com.blankthings.basebackend.user.dto.LoginRequest
+import com.blankthings.basebackend.user.dto.LoginResponse
 import jakarta.validation.Valid
-import jakarta.validation.constraints.Email
-import jakarta.validation.constraints.NotBlank
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -77,16 +77,3 @@ class UserController(
             }
         }
 }
-
-data class LoginRequest(
-    @field:Email @field:NotBlank val email: String,
-)
-
-data class LoginResponse(
-    val successMessage: String =
-        """
-        Your login link has been sent!
-        Please check your email to login.
-        If you can't find the login link in your email, be sure to check your spam folder.
-        """.trimIndent(),
-)
