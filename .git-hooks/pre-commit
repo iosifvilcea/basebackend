@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+./gradlew spotlessCheck --daemon || {
+    echo "Formatting issues found. Running spotlessApply to fix them..."
+    ./gradlew spotlessApply --daemon
+    echo "Files have been formatted. Stage the changes and re-commit."
+    exit 1
+}
