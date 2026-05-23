@@ -28,6 +28,7 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.bucket4j.core)
     implementation(libs.spring.boot.starter)
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.spring.boot.starter.security)

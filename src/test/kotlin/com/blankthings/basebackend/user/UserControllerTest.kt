@@ -5,7 +5,9 @@ import com.blankthings.basebackend.auth.ACCESS_TOKEN
 import com.blankthings.basebackend.auth.CookieManager
 import com.blankthings.basebackend.auth.JwtService
 import com.blankthings.basebackend.auth.REFRESH_TOKEN
+import com.blankthings.basebackend.ratelimit.RateLimiter
 import jakarta.servlet.http.Cookie
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.BDDMockito.given
@@ -41,6 +43,14 @@ class UserControllerTest {
     @MockitoBean
     private lateinit var analyticsTracker: AnalyticsTracker
 
+    @MockitoBean
+    private lateinit var rateLimiter: RateLimiter
+
+    @BeforeEach
+    fun setUp() {
+        given(rateLimiter.isAllowed(anyString())).willReturn(true)
+    }
+
     private fun stubAuthCookies() {
         given(cookieManager.accessCookie(anyString())).willReturn(
             ResponseCookie.from(ACCESS_TOKEN, "access-token").build(),
@@ -51,6 +61,18 @@ class UserControllerTest {
     }
 
     // --- POST /api/auth ---
+
+    @Test
+    fun `POST login returns 429 when rate limit is exceeded`() {
+        given(rateLimiter.isAllowed(anyString())).willReturn(false)
+        mockMvc
+            .post("/api/auth") {
+                contentType = MediaType.APPLICATION_JSON
+                content = """{"email": "user@example.com"}"""
+            }.andExpect {
+                status { isTooManyRequests() }
+            }
+    }
 
     @Test
     fun `POST login returns 200 with success message`() {

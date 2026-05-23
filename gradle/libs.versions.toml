@@ -1,4 +1,5 @@
 [versions]
+bucket4j = "8.10.1"
 json-web-token = "0.13.0"
 kotlin = "2.2.21"
 mockk = "1.13.14"
@@ -7,6 +8,8 @@ spring-dependency-management = "1.1.7"
 spotless = "8.4.0"
 
 [libraries]
+bucket4j-core = { module = "com.bucket4j:bucket4j-core", version.ref = "bucket4j" }
+
 jwt-jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "json-web-token" }
 jwt-jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "json-web-token" }
 jwt-jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "json-web-token" }
